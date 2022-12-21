@@ -62,6 +62,7 @@ def test_grade_assignment_bad_grade(client, h_teacher_1):
     data = response.json
 
     assert data['error'] == 'ValidationError'
+    assert data['message'] == {'grade': ['Must be one of: A, B, C, D.']}
 
 
 def test_grade_assignment_bad_assignment(client, h_teacher_1):
@@ -81,6 +82,7 @@ def test_grade_assignment_bad_assignment(client, h_teacher_1):
     data = response.json
 
     assert data['error'] == 'FyleError'
+    assert data['message'] == 'No assignment with this id was found'
 
 
 def test_grade_assignment_draft_assignment(client, h_teacher_1):
@@ -91,7 +93,7 @@ def test_grade_assignment_draft_assignment(client, h_teacher_1):
         '/teacher/assignments/grade',
         headers=h_teacher_1
         , json={
-            "id": 2,
+            "id": 5,
             "grade": "A"
         }
     )
@@ -100,3 +102,20 @@ def test_grade_assignment_draft_assignment(client, h_teacher_1):
     data = response.json
 
     assert data['error'] == 'FyleError'
+    assert data['message'] == 'This assignment is not submitted yet or is already graded.'
+
+def test_grade_assignment_submitted_assignment(client, h_teacher_2):
+    """
+    failure case: only a submitted assignment can be graded
+    """
+    response = client.post(
+        '/teacher/assignments/grade',
+        headers=h_teacher_2
+        , json={
+            "id": 2,
+            "grade": "A"
+        }
+    )
+
+    assert response.status_code == 200
+    data = response.json
