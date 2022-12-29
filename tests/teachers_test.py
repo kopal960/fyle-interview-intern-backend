@@ -62,7 +62,7 @@ def test_grade_assignment_bad_grade(client, h_teacher_1):
     data = response.json
 
     assert data['error'] == 'ValidationError'
-    assert data['message'] == {'grade': ['Must be one of: A, B, C, D.']}
+    assert data['message'] == {'grade': ['Invalid enum value AB']}
 
 
 def test_grade_assignment_bad_assignment(client, h_teacher_1):
